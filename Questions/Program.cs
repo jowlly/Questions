@@ -27,7 +27,114 @@ namespace Questions
 
         private static void V17()
         {
-            throw new NotImplementedException();
+            //Находим контур(оболочку мн-ва точек) после чего перебираем все возможные треугольники, состоящие из точек контура.
+            //Это справедливо, так как контур - фигура наибольшей площади, охватывающая все точки, а значит и треугольник может охватить как можно больше точек
+
+
+            int[] x = { 1, 2, 3, 2, 2, 4, 5,-6 };
+            int[] y = { -1, 2, -3, -1, -2, 4,0,-2 };
+
+            List<int[]> contur = new List<int[]>();
+
+            int x0 = x[0];
+            int y0 = y[0];
+
+            //ищем самую левую нижнюю точку из множества
+            for (int i = 0; i < x.Length; i++)
+            {
+                if (x[i] < x0 || (x[i] == x0 && y[i] < y0))
+                {
+                    x0 = x[i];
+                    y0 = y[i];
+                }
+            }
+
+            int endx = 0;
+            int endy = 0;
+
+            do
+            {
+                contur.Add(new int[] { x0, y0 });
+                endx = x[0];
+                endy = y[0];
+
+                //Ищем ближайшую точку с наименьшим полярным углом относительно текущей точки
+                for (int i = 1; i < x.Length; i++)
+                {
+                    if ((x0 == endx && y0 == endy) || ((endx - x0) * (y[i] - y0) - (x[i] - x0) * (endy - y0) > 0))
+                    {
+                        endx = x[i];
+                        endy = y[i];
+                    }
+                }
+
+                //Переходим к следующей точке
+                x0 = endx;
+                y0 = endy;
+
+
+            } while (!(endx == contur[0][0] && endy == contur[0][1]));  //Пока не придём в начало
+
+
+            int max = 0;
+            List<int[]> maxTriangle = new List<int[]>
+            {
+                new int[] { 0, 0 },
+                new int[] { 0, 0 },
+                new int[] { 0, 0 }
+            };
+
+
+            for (int i = 0; i < contur.Count-2; i++)
+            {
+                for (int j = i+1; j < contur.Count-1; j++)
+                {
+                    for (int k = j+1; k < contur.Count; k++)
+                    {
+                        int nPoints = CountPointsInTriangle(contur,i,j,k);
+                        if(nPoints > max)
+                        {
+                            max = nPoints;
+                            maxTriangle[0] = contur[i];
+                            maxTriangle[1] = contur[j];
+                            maxTriangle[2] = contur[k];
+                        }
+                    }
+                }
+            }
+
+            Console.WriteLine("Треугольник с максимальным количеством точек внутри него:"+ 
+                "(" + maxTriangle[0][0] + "," + maxTriangle[0][1] + ")" +
+                "(" + maxTriangle[1][0] + "," + maxTriangle[1][1] + ")" + 
+                "(" + maxTriangle[2][0] + "," + maxTriangle[2][1] + ")" +
+                "\nКоличество точек = " + max);
+            Console.ReadKey();
+        }
+
+        private static int CountPointsInTriangle(List<int[]> contur, int first, int second, int third)
+        {
+            int nPoints = 0;
+            for (int i = 0; i < contur.Count; i++)
+            {
+                if (i == first || i == second || i == third) continue;
+
+                double orientFirstSecond = FindOrientation(contur[first][0], contur[first][1], contur[second][0], contur[second][1], contur[i][0], contur[i][1]);
+                double orientSecondThird = FindOrientation(contur[second][0], contur[second][1], contur[third][0], contur[third][1], contur[i][0], contur[i][1]);
+                double orientFirstThird = FindOrientation(contur[first][0], contur[first][1], contur[third][0], contur[third][1], contur[i][0], contur[i][1]);
+
+                if(orientFirstSecond >= 0 && orientSecondThird >= 0 && orientFirstThird >=0 ||
+                    orientFirstSecond < 0 && orientSecondThird < 0 && orientFirstThird < 0)
+                {
+                    nPoints++;
+                }
+
+            }
+            return nPoints;
+        }
+
+        private static double FindOrientation(int x1, int y1, int x2, int y2, int xt, int yt)
+        {
+            return xt * (y2 - y1) + yt * (x1 - x2) + y1 * x2 - x1 * y2;
         }
 
         private static void V9()
@@ -495,6 +602,7 @@ namespace Questions
             int x0 = x[0];
             int y0 = y[0];
 
+            //ищем самую левую нижнюю точку из множества
             for (int i = 0; i < x.Length; i++)
             {
                 if (x[i] < x0 || (x[i] == x0 && y[i] < y0))
@@ -513,6 +621,7 @@ namespace Questions
                 endx = x[0];
                 endy = y[0];
 
+                //Ищем ближайшую точку с наименьшим полярным углом относительно текущей точки
                 for (int i = 1; i < x.Length; i++)
                 {
                     if ((x0 == endx && y0 == endy) || ((endx - x0) * (y[i] - y0) - (x[i] - x0) * (endy - y0) > 0))
@@ -522,11 +631,12 @@ namespace Questions
                     }
                 }
 
+                //Переходим к следующей точке
                 x0 = endx;
                 y0 = endy;
 
 
-            } while (!(endx == contur[0][0] && endy == contur[0][1]));
+            } while (!(endx == contur[0][0] && endy == contur[0][1]));  //Пока не придём в начало
 
             //while(true)
             //{
