@@ -17,12 +17,51 @@ namespace Questions
             //V7();
             //V8();
             //V9();
+            //V10();
             //V12();
             //V14(); - todo
-            //V10();
-            V17();
+            //V17();
             //V18();
             //V19();
+            V20();
+        }
+
+        private static void V20()
+        {
+            List<Pair> pairs = new List<Pair>();
+            int n = 5;
+            for (int i = 0; i < n; i++)
+            {
+                string[] pair = Console.ReadLine().Split(',');
+                
+                pairs.Add(new Pair(pair[0], pair[1]));
+            }
+
+            bool[] visited = new bool[pairs.Count];
+            visited[0] = true;
+            List<string> chain = new List<string>();
+            chain.Add(pairs[0].First);
+
+            for (int i = 0; i < pairs.Count - 1; i++)
+            {
+                if (pairs[i].Second == pairs[i + 1].First && pairs[i].First == pairs[i+1].Second)
+                {
+                    chain.Add(pairs[i].Second);
+                }
+            }
+            chain.Add(pairs[pairs.Count - 1].Second);
+
+            foreach (string item in chain)
+            {
+                Console.WriteLine(item);
+            }
+
+            if (chain.Count < pairs.Count)
+            {
+                Console.WriteLine("последовательность противоречивая");
+            }
+
+            Console.ReadKey();
         }
 
         private static void V17()
@@ -467,35 +506,22 @@ namespace Questions
             visited[0] = true;
             List<string> chain = new List<string>();
             chain.Add(pairs[0].First);
-            string next = pairs[0].Second;
-            int k = 1;
-            while (k<pairs.Count)
+
+            for (int i = 0; i < pairs.Count-1; i++)
             {
-                for (int j = 0; j < pairs.Count; j++)
+                if (pairs[i].Second == pairs[i + 1].First)
                 {
-                    if (pairs[j].First == next && !visited[j])
-                    {
-                        chain.Add(next);
-                        next = pairs[j].Second;
-                        visited[j] = true;
-                        break;
-                    }
+                    chain.Add(pairs[i].Second);
                 }
-                k++;
             }
-            chain.Add(next);
+            chain.Add(pairs[pairs.Count-1].Second);
 
-
-            foreach(string item in chain)
+            foreach (string item in chain)
             {
                 Console.WriteLine(item);
             }
 
-            if (chain.Count < pairs.Count)
-            {
-                Console.WriteLine("последовательность не полная");
-            }
-            else
+            if (chain.Count > pairs.Count) 
             {
                 Console.WriteLine("последовательность полная");
             }
