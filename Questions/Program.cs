@@ -51,9 +51,19 @@ namespace Questions
         {
             Node<int> root = new Node<int>(0);
             root.Left = new Node<int>(1);
+            root.Left.Parent = root;
+
             root.Right = new Node<int>(2);
+            root.Right.Parent = root;
+
             root.Left.Left = new Node<int>(3);
+            root.Left.Left.Parent = root.Left;
+
             root.Right.Right = new Node<int>(4);
+            root.Right.Right.Parent = root.Right;
+
+            root.Right.Left = new Node<int>(6);
+            root.Right.Left.Parent = root.Right;
 
             copyTree.Data = root.Data;  //копируем корень
             PreOrder(root,root.Data);
@@ -61,14 +71,14 @@ namespace Questions
             Console.WriteLine("Листьев: " + countLeafs);
             Console.WriteLine(root.Data);
             Console.WriteLine(root.Left.Data + " " + root.Right.Data);
-            Console.WriteLine(root.Left.Left.Data + " " + root.Right.Right.Data);
+            Console.WriteLine(root.Left.Left.Data + " " + root.Right.Left.Data +" "+ root.Right.Right.Data);
             Console.ReadKey();
         }
 
         static int countLeafs = 0;
         static Node<int> copyTree = new Node<int>(0);
         static Node<int> curNode = copyTree;
-        private static Node<int> PreOrder(Node<int> node, int rootData)
+        private static void PreOrder(Node<int> node, int rootData)
         {
             //чётные уменьшить в 2 раза 19вариант
             if(node.Data %2 == 0)
@@ -92,16 +102,15 @@ namespace Questions
             {
                 curNode.Left = new Node<int>(node.Left.Data);   //Для копирования
                 curNode = curNode.Left;//Для копирования
-                return PreOrder(node.Left, rootData);
+                PreOrder(node.Left, rootData);
             }
+            curNode = node.Parent == null ? copyTree : node.Parent;
             if (node.Right != null)
             {
                 curNode.Right = new Node<int>(node.Right.Data);//Для копирования
                 curNode = curNode.Right;//Для копирования
-                return PreOrder(node.Right, rootData);
+                PreOrder(node.Right, rootData);
             }
-
-            return null;//Для копирования
         }
 
         private static void V6_7_8_9__3()
