@@ -12,6 +12,7 @@ namespace Questions
     {
         static void Main(string[] args)
         {
+            V3();
             //V5();
             //V6();
             //V7();
@@ -23,7 +24,66 @@ namespace Questions
             //V17();
             //V18();
             //V19();
-            V20();
+            //V20();
+        }
+
+        private static void V3()
+        {
+            //Пусть в чемпионате лагеря участвовало n команд. Тогда все встречи всех команд можно представить в виде полного графа, где вершины - команды, а рёбра - игры.
+            //Таким образом, количество сыгранных игр - n(n-1)/2. И всего было разыграно n(n-1) очков (т.к. за победу дают 2, а за ничью каждому по 1)
+            //Призёры все вместе заработали 15 очков (7+5+3). Значит остальным досталось n(n-1) - 15 очков.
+            //При этом каждая из оставшихся n-3 команд набрали 3 или меньше очков (иначе было бы другое третье место). То есть на всех они заработали не больше 3(n-3)
+            //Но с другой стороны они не могут набрать больше, чем n(n-1) - 15.
+            //Отсюда: n(n-1)-15 <= 3(n-3).
+            //Получим n^2-4n-6<=0
+            //Тогда -1<=n<=5
+            //-1, 0, 1, 2 команды мы не рассматриваем. Сразу не подходят, т.к. противоречат условию
+            //3 комнады быть не может, потому как они не смогут разыграть между собой 15 очков (у графа 3 вершины, значит всего 3*2=6 очков)
+            //4 команды: 4*3 = 12 по тем же соображениям.
+            //Значит всего 5 команд (5*4 = 20, все ОК)
+            //и на последние две из них приходится 20-15 = 5 очков. Тогда нужно решить, как распределены очки между последними двумя командами: либо 4-1, либо 3-2.
+            //4-1 быть не может, потому как поменяется третье место, а значит берём 3-2 и ответ - у последнего места 2 очка.
+
+            int firstPlacePoints = 14;
+            int secondPlacePoints = 12;
+            int thirdPlacePoints = 11;
+            int sumWinnersPoints = firstPlacePoints + secondPlacePoints + thirdPlacePoints;
+            
+            // n*(n-1)- firstPlacePoints - secondPlacePoints - thirdPlacePoints <= thirdPlacePoints  * (n-3)
+            // n^2 - (1+thirdPlacePoints)*n -  firstPlacePoints - secondPlacePoints + 2*thirdPlacePoints<=0
+            
+            int b = (-1)*thirdPlacePoints -1;
+            int c = 2 * thirdPlacePoints - firstPlacePoints - secondPlacePoints;
+            double D = b * b - 4 * c;
+            double x1 = 0;
+            double x2 = 0;
+            if (D >= 0)
+            {
+                x1 = ((-1) * b - Math.Sqrt(D)) / 2;
+                x2 = ((-1) * b + Math.Sqrt(D)) / 2;
+            }
+            else
+            {
+                Console.WriteLine("Ошибка");
+                Console.ReadKey();
+                return;
+            }
+            //Т.к. A>0 и D>0, то решение неравенства между x1 и x2
+
+            int numOfTeams = 3;
+            int end = (int)Math.Truncate(Math.Max(x1, x2));
+            for (int i = (int)Math.Truncate(Math.Min(x1,x2)); i <= end; i++)
+            {
+                if (i * (i - 1) > sumWinnersPoints && i>=3)
+                {
+                    numOfTeams = i; 
+                    break;
+                }
+            }
+
+            Console.WriteLine("Команды - непризёры: " + (numOfTeams - 3));
+            Console.ReadKey();
+
         }
 
         private static void V20()
