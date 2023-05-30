@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -12,7 +13,10 @@ namespace Questions
     {
         static void Main(string[] args)
         {
-            V3();
+            //V3_4__3();
+            //V6_7_8_9__3();
+            V14__3();
+            //V3();
             //V5();
             //V6();
             //V7();
@@ -20,6 +24,7 @@ namespace Questions
             //V9();
             //V10();
             //V12();
+            //V13();
             //V14(); - todo
             //V17();
             //V18();
@@ -27,8 +32,402 @@ namespace Questions
             //V20();
         }
 
+        class Node<T>
+        {
+            public T Data { get; set; }
+            public Node<T> Left { get; set; }
+            public Node<T> Right { get; set; }
+            public Node<T> Parent { get; set; }
+
+            public Node(T data)
+            {
+                Data = data;
+            }
+        }
+
+        static List<Node<int>> answer = new List<Node<int>>();
+
+        private static void V14__3()
+        {
+            Node<int> root = new Node<int>(0);
+            root.Left = new Node<int>(1);
+            root.Right = new Node<int>(2);
+            root.Left.Left = new Node<int>(3);
+            root.Right.Right = new Node<int>(4);
+
+            copyTree.Data = root.Data;  //копируем корень
+            PreOrder(root,root.Data);
+
+            Console.WriteLine("Листьев: " + countLeafs);
+            Console.WriteLine(root.Data);
+            Console.WriteLine(root.Left.Data + " " + root.Right.Data);
+            Console.WriteLine(root.Left.Left.Data + " " + root.Right.Right.Data);
+            Console.ReadKey();
+        }
+
+        static int countLeafs = 0;
+        static Node<int> copyTree = new Node<int>(0);
+        static Node<int> curNode = copyTree;
+        private static Node<int> PreOrder(Node<int> node, int rootData)
+        {
+            //чётные уменьшить в 2 раза 19вариант
+            if(node.Data %2 == 0)
+            {
+                node.Data /= 2;
+            }
+
+            //Количество листьев 14 вариант
+            if(node.Left == null && node.Right == null)
+            {
+                countLeafs++;
+            }
+
+            //Удалить меньшие корня 20 вариант
+            if(node.Data < rootData)
+            {
+                node = null;
+            }
+
+            if (node.Left != null)
+            {
+                curNode.Left = new Node<int>(node.Left.Data);   //Для копирования
+                curNode = curNode.Left;//Для копирования
+                return PreOrder(node.Left, rootData);
+            }
+            if (node.Right != null)
+            {
+                curNode.Right = new Node<int>(node.Right.Data);//Для копирования
+                curNode = curNode.Right;//Для копирования
+                return PreOrder(node.Right, rootData);
+            }
+
+            return null;//Для копирования
+        }
+
+        private static void V6_7_8_9__3()
+        {
+            //Для 9 варианта
+            List<Vertex> vertices1 = new List<Vertex>()
+            {
+                new Vertex("1"),
+                new Vertex("2"),
+                new Vertex("3")
+            };
+
+            List<Edge> edges1 = new List<Edge>()
+            {
+                new Edge(vertices1[0],vertices1[1],1),
+                new Edge(vertices1[2],vertices1[1],1),
+            };
+
+            int[,] FirstMatrix = GetAdjacencyMatrix(vertices1, edges1);
+            Console.WriteLine("\nМатрица смежности(1й граф)");
+            for (int i = 0; i < FirstMatrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < FirstMatrix.GetLength(0); j++)
+                {
+                    Console.Write(FirstMatrix[i, j] + " ");
+                }
+                Console.WriteLine();
+            }
+
+            List<Vertex> vertices2 = new List<Vertex>()
+            {
+                new Vertex("1"),
+                new Vertex("2"),
+                new Vertex("3")
+            };
+
+            List<Edge> edges2 = new List<Edge>()
+            {
+                new Edge(vertices2[0],vertices2[1],1),
+                new Edge(vertices2[2],vertices2[1],1),
+                new Edge(vertices2[2],vertices2[0],1),
+            };
+
+            int[,] SecondMatrix = GetAdjacencyMatrix(vertices2, edges2);
+            Console.WriteLine("\nМатрица смежности(2й граф)");
+            for (int i = 0; i < SecondMatrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < SecondMatrix.GetLength(0); j++)
+                {
+                    Console.Write(SecondMatrix[i, j] + " ");
+                }
+                Console.WriteLine();
+            }
+
+            // Объединение
+
+            int[,] OrMatrix = new int[vertices1.Count, edges1.Count];
+            Console.WriteLine("\nМатрица смежности(Объединение)");
+            for (int i = 0; i < OrMatrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < OrMatrix.GetLength(0); j++)
+                {
+                    Console.Write(OrMatrix[i, j] + " ");
+                }
+                Console.WriteLine();
+            }
+
+            //Пересечение
+            List<Vertex> verticesAndAns = new List<Vertex>();
+            List<Edge> edgesAndAns = new List<Edge>();
+
+            foreach (Vertex vertexCandidate in vertices2)
+            {
+                foreach (Vertex vertex in vertices1)
+                {
+                    if (vertex.Name == vertexCandidate.Name)
+                    {
+                        verticesAndAns.Add(vertexCandidate);
+                        break;
+                    }
+                }
+            }
+            foreach (Edge edgeCandidate in edges2)
+            {
+                foreach (Edge edge in edges1)
+                {
+                    if (edge.VertexIn == edgeCandidate.VertexIn &&
+                        edge.VertexOut == edgeCandidate.VertexOut)
+                    {
+                        edgesAndAns.Add(edgeCandidate);
+                        break;
+                    }
+                }
+            }
+
+            int[,] AndMatrix = GetAdjacencyMatrix(verticesAndAns, edgesAndAns);
+            Console.WriteLine("\nМатрица смежности(Пересечение)");
+            for (int i = 0; i < AndMatrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < AndMatrix.GetLength(0); j++)
+                {
+                    Console.Write(AndMatrix[i, j] + " ");
+                }
+                Console.WriteLine();
+            }
+
+            //Декартово произведение
+            int[,] matrix1 = GetAdjacencyMatrix(vertices1,edges1);
+            int[,] matrix2 = GetAdjacencyMatrix(vertices2, edges2);
+
+            if (matrix1.GetLength(0) != matrix2.GetLength(1))
+            {
+                throw new Exception("Умножение не возможно! Количество столбцов первой матрицы не равно количеству строк второй матрицы.");
+            }
+
+            int[,] decartMulMatrix = new int[matrix1.GetLength(0), matrix2.GetLength(1)];
+
+            for (int i = 0; i < matrix1.GetLength(0); i++)
+            {
+                for (int j = 0; j < matrix2.GetLength(1); j++)
+                {
+                    decartMulMatrix[i, j] = 0;
+
+                    for (int k = 0; k < matrix1.GetLength(1); k++)
+                    {
+                        decartMulMatrix[i, j] = Convert.ToBoolean(decartMulMatrix[i, j]) || Convert.ToBoolean(matrix1[i, k]) && Convert.ToBoolean(matrix2[k, j]) == true ? 1:0;
+                    }
+                }
+            }
+
+            Console.WriteLine("\nМатрица смежности (Декартово произведение)");
+            for (int i = 0; i < decartMulMatrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < decartMulMatrix.GetLength(0); j++)
+                {
+                    Console.Write(decartMulMatrix[i, j] + " ");
+                }
+                Console.WriteLine();
+            }
+
+            Console.ReadKey();
+        }
+
+        class Vertex
+        {
+            public string Name { get; set; }
+            public Vertex(string name) { Name = name; }
+        }
+
+        class Edge
+        {
+            public Vertex VertexIn { get; set; }
+            public Vertex VertexOut { get; set; }
+            public int Weight { get; set; }
+            public Edge(Vertex vOut, Vertex vIn,int weight) 
+            {
+                VertexIn = vIn;
+                VertexOut = vOut;
+                Weight = weight;
+            }
+        }
+        private static void V3_4__3()
+        {
+            List<Vertex> vertices = new List<Vertex>()
+            {
+                new Vertex("1"),
+                new Vertex("2"),
+                new Vertex("3"),
+                new Vertex("4"),
+            };
+
+            List<Edge> edges = new List<Edge>()
+            {
+                new Edge(vertices[0],vertices[1],1),
+                new Edge(vertices[1],vertices[2],1),
+                new Edge(vertices[2],vertices[3],1),
+            };
+            int[,] adjacencyMatrix = GetAdjacencyMatrix(vertices, edges);
+
+            Console.WriteLine("Матрица смежности");
+            for (int i = 0; i < adjacencyMatrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < adjacencyMatrix.GetLength(0); j++)
+                {
+                    Console.Write(adjacencyMatrix[i, j] + " ");
+                }
+                Console.WriteLine();
+            }
+
+            int countThree = 0;
+            for (int i = 0; i < vertices.Count - 1; i++)
+            {
+                for (int j = i + 1; j < vertices.Count; j++)
+                {
+                    countThree += Countwalks(adjacencyMatrix, int.Parse(vertices[i].Name) - 1, int.Parse(vertices[j].Name) - 1, 3);
+                }
+            }
+            Console.WriteLine("количество путей длины 3:" + countThree);
+            Console.ReadKey();
+        }
+
+        private static int[,] GetAdjacencyMatrix(List<Vertex> vertices, List<Edge> edges)
+        {
+            int[,] adjacencyMatrix = new int[vertices.Count, vertices.Count];
+
+            //Обнуляем матрицу
+            for (int i = 0; i < adjacencyMatrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < adjacencyMatrix.GetLength(0); j++)
+                {
+                    adjacencyMatrix[i, j] = 0;
+                }
+            }
+
+            for (int i = 0; i < vertices.Count; i++)
+            {
+                for (int j = 0; j < edges.Count; j++)
+                {
+                    if (edges[j].VertexOut == vertices[i])
+                    {
+                        adjacencyMatrix[i, int.Parse(edges[j].VertexIn.Name) - 1] += edges[j].Weight;
+                    }
+                }
+            }
+
+            return adjacencyMatrix;
+        }
+
+        // A naive recursive function to
+        // count walks from u to v with
+        // k edges
+        static int Countwalks(int[,] adjMatrix, int u,
+                              int v, int k)
+        {
+            //Базовые случаи
+            if (k == 0 && u == v)   //Укзаана одна и та же вершина, путь длины 0
+                return 1;
+            if (k == 1 && adjMatrix[u, v] == 1) //Есть путь из u в v длины 1 
+                return 1;
+            if (k <= 0)     //Неверно указана длина
+                return 0;
+
+            int count = 0;
+
+            // Поиск в ширину по всем смежным с u
+            for (int i = 0; i < adjMatrix.GetLength(0); i++)
+            {
+                // Проверка смежности
+                if (adjMatrix[u, i] == 1)
+                    count += Countwalks(adjMatrix, i, v, k - 1);
+            }
+
+            return count;
+        }
+        private static void V13()
+        {
+            //O(n^2) - худший случай
+            //Разрез прямолинеен, поэтому, чтобы разрезать торт на 2 равные части его нужно проводить всегда через центр торта
+            //Таким образом, мы должны найти такую "прямую", относительно которой все точки(свечи) плоскости лежали бы по одну сторону
+            //относительно этой прямой.
+            // Идея решения в том, чтобы рассматривать все пары точек и смотреть по одну ли сторону от центра они лежат.
+            // Для этого используются вектора. Вектор от начала координат (центра торта) до точки (свечи). 
+            // Выбираем какую-то точку. К ней строим вектор из начала координат. Далее перебираем все точки, строим вектор, находим векторное произведение.
+            // Знак векторного произведения указывает нам на взаимное расположение веткоров. Если у всех точек, которые мы перебираем знак совпадает, то
+            // Они все лежат по одну сторону от какого-то разреза, а значит его можно провести.
+
+            PointF center = new PointF(0,0);
+            PointF[] candles = new PointF[]
+            {
+                new PointF(0,1),
+                new PointF(1,1),
+                new PointF(2,1),
+                new PointF(3,1),
+                new PointF(4,2),
+            };
+
+            for (int i = 0; i < candles.Length; i++)
+            {
+                //подбираем первую точку и строим вектор для неё с помощью вычитания координат точки и центра
+                PointF firstVector = PointF.Subtract(candles[i], new SizeF(center));
+                int previousSign = 0;
+                var flag = true;
+
+                for (int j = 0; j < candles.Length; j++)
+                {
+                    //Выбираем вторую точку в пару к первой и строим для неё вектор
+                    if (i != j)
+                    {
+                        PointF secondVector = PointF.Subtract(candles[j], new SizeF(center));
+
+                        //Знак векторного произведения. Вычисляем взаимное расположение векторов.
+                        int sign = Math.Sign(firstVector.X * secondVector.Y - secondVector.X * firstVector.Y);
+
+                        if (previousSign == 0) //Это первая пара для выбранной
+                        {   //точка в начале координат или точки в разных половинах координатной прямой
+                            if (sign == 0 && (Math.Sign(firstVector.X) != Math.Sign(secondVector.X) ||
+                                Math.Sign(firstVector.Y) != Math.Sign(secondVector.Y)))
+                            {
+                                flag = false;
+                                break;
+                            }
+
+                            //устанавливаем указатель на сторону относительно прямой - с ней будем сравнивать
+                            previousSign = sign;
+                        }
+                        else if (previousSign != sign) // Разрез не возможен - знаки у произведений разные
+                        {
+                            flag = false;
+                            break; //То выходим из цикла
+                        }
+                    }
+                }
+                if (flag)
+                {
+                    Console.WriteLine("Можно");
+                    Console.ReadKey();
+                }
+            }
+
+            Console.WriteLine("Нельзя");
+            Console.ReadKey();
+        }
+
         private static void V3()
         {
+            //O(1)
             //Пусть в чемпионате лагеря участвовало n команд. Тогда все встречи всех команд можно представить в виде полного графа, где вершины - команды, а рёбра - игры.
             //Таким образом, количество сыгранных игр - n(n-1)/2. И всего было разыграно n(n-1) очков (т.к. за победу дают 2, а за ничью каждому по 1)
             //Призёры все вместе заработали 15 очков (7+5+3). Значит остальным досталось n(n-1) - 15 очков.
@@ -88,6 +487,7 @@ namespace Questions
 
         private static void V20()
         {
+            //O(n) смотрим поочереди введённые пары. Если из текущей в предыдущую попасть можно, но и из следующей в текущую, то последовательность противоречива
             List<Pair> pairs = new List<Pair>();
             int n = 5;
             for (int i = 0; i < n; i++)
@@ -125,9 +525,11 @@ namespace Questions
         }
 
         private static void V17()
-        {
+        {   
+            //O(n^3)
             //Находим контур(оболочку мн-ва точек) после чего перебираем все возможные треугольники, состоящие из точек контура.
-            //Это справедливо, так как контур - фигура наибольшей площади, охватывающая все точки, а значит и треугольник может охватить как можно больше точек
+            //Это справедливо, так как контур - фигура наибольшей площади, охватывающая все точки,
+            //а значит и треугольник может охватить как можно больше точек
 
 
             int[] x = { 1, 2, 3, 2, 2, 4, 5,-6 };
@@ -221,6 +623,7 @@ namespace Questions
                 double orientSecondThird = FindOrientation(contur[second][0], contur[second][1], contur[third][0], contur[third][1], contur[i][0], contur[i][1]);
                 double orientFirstThird = FindOrientation(contur[first][0], contur[first][1], contur[third][0], contur[third][1], contur[i][0], contur[i][1]);
 
+                //Если у всех трех свопал знак, то точка внутри
                 if(orientFirstSecond >= 0 && orientSecondThird >= 0 && orientFirstThird >=0 ||
                     orientFirstSecond < 0 && orientSecondThird < 0 && orientFirstThird < 0)
                 {
@@ -232,7 +635,7 @@ namespace Questions
         }
 
         private static double FindOrientation(int x1, int y1, int x2, int y2, int xt, int yt)
-        {
+        {   // Векторное проиведение
             return xt * (y2 - y1) + yt * (x1 - x2) + y1 * x2 - x1 * y2;
         }
 
@@ -245,6 +648,7 @@ namespace Questions
             //Так как граф связен и все его вершины имеют чётную степень, то такой граф Эйлеров, а значит в нём есть эйлеров цикл, проходящий по всем вершинам только 1 раз.
             //Представим цикл как цепочку: 1-2-3-4-5-6-1. Допустим удалён канал(ребро или путь) 1-2. Связность графа не нарушается, так как из 2 в 1 есть путь 2-3-4-5-6-1.
             //При этом удалив ещё один канал, нельзя гарантировать, что связность графа сохранится, так как может быть удалён мост.
+            //Стоит отметить, что удаление одного из центров так же не нарушает связность графа по аналогичным суждениям.
 
         }
 
@@ -325,10 +729,9 @@ namespace Questions
         #region V6
         private static void V6()
         {
-
             int nColors = 64;
 
-            if(nColors < 0 && nColors > 64)
+            if(nColors < 1 && nColors > 64)
             {
                 Console.WriteLine("Ошибка ввода");
                 Console.ReadKey();
