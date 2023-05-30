@@ -12,7 +12,8 @@ namespace Questions
     {
         static void Main(string[] args)
         {
-            V6();
+            V5();
+            //V6();
             //V12();
             //V14(); - todo
             //V10();
@@ -20,6 +21,31 @@ namespace Questions
             //V19();
         }
 
+        private static void V5()
+        {
+            //Делим изначальное количество участников пополам и считаем,
+            //что в эти половинах все со всеми сыграли. - полный граф, где вершины - игроки, а рёбра - отношение сыгранной игры.
+            //Получается, что условие про то, что всегда есть тройка, в которой две команды уже сыграли.
+            //Посчитать это можно так: k * (k - 1)/2 + m * (m-1),
+            //где k и m - кол-ва участников в группах (если брать нечётное количество участников, то исходное множество разобьётся не ровно пополам)
+
+            int teams = 20;
+
+            int nFirst = teams / 2;
+            int nSecond = teams / 2;
+
+            if (teams % 2 != 0)
+            {
+                nSecond++;
+            }
+
+
+            int games = (nFirst * (nFirst - 1)) / 2 + (nSecond * (nSecond - 1)) / 2;
+            Console.WriteLine("Количество сыгранных игр = " + games);
+            Console.ReadKey();
+        }
+
+        #region V6
         private static void V6()
         {
 
@@ -236,7 +262,8 @@ namespace Questions
             }
             return -1;
         }
-
+        #endregion
+        
         class Pair
         {
             public string First { get; set; }
