@@ -76,7 +76,7 @@ namespace Questions
                 }
                 else
                 {
-                    if (CheckCornerBlocked(desk, circleIndex, place))   //Поставили рядом с углом, рядом с кт
+                    if (CheckCornerBlocked(desk, circleIndex, place))   //Поставили рядом с углом, рядом с которым уже ставили
                     {
                         nPairs += 2;
                     }
