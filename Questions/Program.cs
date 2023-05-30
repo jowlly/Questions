@@ -12,11 +12,229 @@ namespace Questions
     {
         static void Main(string[] args)
         {
+            V6();
             //V12();
             //V14(); - todo
             //V10();
             //V18();
-            V19();
+            //V19();
+        }
+
+        private static void V6()
+        {
+
+            int nColors = 64;
+
+            if(nColors < 0 && nColors > 64)
+            {
+                Console.WriteLine("Ошибка ввода");
+                Console.ReadKey();
+                return;
+            }
+
+            if(nColors <= 33)
+            {
+                Console.WriteLine("Минимальное количество пар = " + (nColors-1));
+                Console.ReadKey();
+                return;
+            }
+
+            int[,] desk = new int[8, 8];
+
+            desk = new int[,]
+            {
+                { 1,17,1,10,1,5,1,2},
+                { 24,1,16,1,9,1,4,1},
+                { 1,23,1,15,1,8,1,3},
+                { 29,1,22,1,14,1,7,1},
+                { 1,28,1,21,1,13,1,6},
+                { 32,1,27,1,20,1,12,1},
+                { 1,31,1,26,1,19,1,11},
+                { 33,1,30,1,25,1,18,1}
+            };
+
+            int nPairs = 32;
+            nColors -= 33;
+            int deskSize = desk.GetLength(0) - 1;
+            while (nColors > 0)
+            {
+                int circleIndex = FindFreeCircle(desk,deskSize); //Находим первое кольцо, где есть "1"
+
+                int[] place = FindPlace(desk, deskSize, circleIndex);
+
+                if (place.Length == 0)
+                {
+                    Console.WriteLine("Ошибка");
+                    return;
+                }
+
+                desk[place[0], place[1]] = nColors + 33; //Вместо подходящей единицы ставим новый цвет
+
+                if (CheckCircleCorner(desk, circleIndex, place))   //Поставили в угол кольца
+                {
+                    nPairs += 2;
+                }
+                else
+                {
+                    if (CheckCornerBlocked(desk, circleIndex, place))   //Поставили рядом с углом, рядом с кт
+                    {
+                        nPairs += 2;
+                    }
+                    else   //На стороне кольца
+                    {
+                        nPairs += 3;
+                    }
+                }
+
+                nColors--;
+            }
+
+            Console.WriteLine("Количество пар = " + nPairs);
+
+            Console.ReadKey();
+        }
+
+        private static bool CheckCornerBlocked(int[,] desk, int circleIndex, int[] place)
+        {
+            if (place[0] == circleIndex)
+            {
+                int[] leftCornerCandidate = new int[] { place[0], place[1] - 1 };
+                if (CheckCircleCorner(desk, circleIndex, leftCornerCandidate))
+                {
+                    if (desk[leftCornerCandidate[0] + 1, leftCornerCandidate[1]] != 1)
+                    {
+                        return true;
+                    }
+                }
+                int[] rightCornerCandidate = new int[] { place[0], place[1] + 1 };
+                if (CheckCircleCorner(desk, circleIndex, rightCornerCandidate))
+                {
+                    if (desk[rightCornerCandidate[0] + 1, rightCornerCandidate[1]] != 1)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            if (place[0] == desk.GetLength(0) - 1 - circleIndex)
+            {
+                int[] leftCornerCandidate = new int[] { place[0], place[1] - 1 };
+                if (CheckCircleCorner(desk, circleIndex, leftCornerCandidate))
+                {
+                    if (desk[leftCornerCandidate[0] - 1, leftCornerCandidate[1]] != 1)
+                    {
+                        return true;
+                    }
+                }
+                int[] rightCornerCandidate = new int[] { place[0], place[1] + 1 };
+                if (CheckCircleCorner(desk, circleIndex, rightCornerCandidate))
+                {
+                    if (desk[rightCornerCandidate[0] - 1, rightCornerCandidate[1]] != 1)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            if (place[1] == circleIndex)
+            {
+                int[] upperCornerCandidate = new int[] { place[0] + 1, place[1]};
+                if (CheckCircleCorner(desk, circleIndex, upperCornerCandidate))
+                {
+                    if (desk[upperCornerCandidate[0], upperCornerCandidate[1]+1] != 1)
+                    {
+                        return true;
+                    }
+                }
+                int[] bottomCornerCandidate = new int[] { place[0] - 1, place[1]};
+                if (CheckCircleCorner(desk, circleIndex, bottomCornerCandidate))
+                {
+                    if (desk[bottomCornerCandidate[0], bottomCornerCandidate[1] + 1] != 1)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            if (place[1] == desk.GetLength(0) - 1 - circleIndex)
+            {
+                int[] upperCornerCandidate = new int[] { place[0] + 1, place[1]};
+                if (CheckCircleCorner(desk, circleIndex, upperCornerCandidate))
+                {
+                    if (desk[upperCornerCandidate[0], upperCornerCandidate[1] - 1] != 1)
+                    {
+                        return true;
+                    }
+                }
+                int[] bottomCornerCandidate = new int[] { place[0] - 1, place[1]};
+                if (CheckCircleCorner(desk, circleIndex, bottomCornerCandidate))
+                {
+                    if (desk[bottomCornerCandidate[0], bottomCornerCandidate[1] - 1] != 1)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool CheckCircleCorner(int[,] desk, int circleIndex, int[] place)
+        {
+            if (place[0] == circleIndex && place[1] == circleIndex ||   //Левый верхний
+                place[0] == desk.GetLength(0) -1 - circleIndex && place[1] == circleIndex ||   //Левый нижний
+                place[0] == desk.GetLength(0) -1 - circleIndex && place[1] == desk.GetLength(0) - 1 - circleIndex ||   //Правый нижний
+                place[0] == circleIndex && place[1] == desk.GetLength(0) - 1 - circleIndex)   //Правый верхний
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private static int[] FindPlace(int[,] desk,int deskSize, int circleIndex)
+        {
+            if (desk[circleIndex, circleIndex] == 1) return new int[] { circleIndex, circleIndex };
+            if (desk[deskSize - circleIndex, deskSize - circleIndex] == 1) return new int[] { deskSize - circleIndex, deskSize - circleIndex };
+
+            for (int i = circleIndex; i < deskSize + 1 - circleIndex; i++)
+            {
+                if (i == circleIndex || i == deskSize - circleIndex) //Обход верхней или нижней части кольца
+                {
+                    for (int j = 0; j < deskSize + 1 - circleIndex; j++)
+                    {
+                        if (desk[i, j] == 1)
+                        {
+                            return new int[] { i, j };
+                        }
+                    }
+                }
+                else if (desk[i,circleIndex] == 1)
+                {
+                    return new int[] { i, circleIndex };
+                }
+                else if(desk[i, deskSize - circleIndex] == 1)
+                {
+                    return new int[] { i, deskSize - circleIndex };
+                }
+            }
+            return new int[0];
+        }
+
+        private static int FindFreeCircle(int[,] desk,int deskSize)
+        {
+            int circleIndex = 0;
+            while(circleIndex <= deskSize / 2)
+            {
+                for (int i = 0; i < deskSize; i++)
+                {
+                    if (desk[circleIndex, i] == 1) return circleIndex;
+                    if (desk[deskSize - circleIndex, i] == 1) return circleIndex;
+                    if (desk[i, circleIndex] == 1) return circleIndex;
+                    if (desk[i, deskSize - circleIndex] == 1) return circleIndex;
+                }
+                circleIndex++;
+            }
+            return -1;
         }
 
         class Pair
